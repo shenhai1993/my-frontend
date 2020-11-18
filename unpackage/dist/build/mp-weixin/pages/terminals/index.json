@@ -1,0 +1,7 @@
+{
+  "navigationBarBackgroundColor": "#000000",
+  "navigationBarTitleText": "终端",
+  "usingComponents": {
+    "drawer": "/pages/components/drawer/index"
+  }
+}

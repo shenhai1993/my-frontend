@@ -76,7 +76,12 @@
 							 }, 500)
 						} else {
 							this.loginFormStatus = true
-							uni.hideLoading()   
+							uni.hideLoading() 
+							uni.showToast({
+							  	title: res.data.message,
+							  	icon: 'none', 
+							  	duration: 1000
+							});
 						}
 					}
 				})
@@ -111,7 +116,7 @@
 					  		} else {
 								uni.showToast({
 									title: res.data.message,
-									icon: "none", 
+									icon: 'none', 
 									duration: 1000
 								});
 							}

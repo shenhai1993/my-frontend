@@ -293,8 +293,9 @@
 											})
 										} else {
 											uni.showToast({
-											    title: "无法删除",
-											    duration: 1000
+											    title: res.data.message,
+												icon: 'none',
+											    duration: 2000
 											})
 										}
 									})

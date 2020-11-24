@@ -7,6 +7,9 @@ import {
 
 export default {
   [SET_CONTENT_LIST] (state, permissions) {
+	permissions.forEach((item,index)=>{
+		item.tpl.thumb_path = item.tpl.thumb_path+'?'+ new Date().getTime()
+	})
 	state.contentLists = state.contentLists.concat(permissions)
   },
   [DELETE_CONTENT_LIST] (state, id) {

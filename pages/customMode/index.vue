@@ -178,7 +178,7 @@
 		},
 		methods: {
 			...mapActions([ 'getContentLists']),
-			...mapMutations(['ADD_CONTENT_LIST' , 'REMOVE_CONTENT_LIST'
+			...mapMutations(['ADD_CONTENT_LIST' , 'REMOVE_CONTENT_LIST', 'REVISE_CONTENT_LIST'
 			]),
 			// 图片修改剪切
 			chooseImg(index,item){
@@ -316,16 +316,20 @@
 									this.removeStatu = false
 									// this.getContentLists({page: 0,pagesize:10})
 								} else {
-									this.REMOVE_CONTENT_LIST()
-									this.getContentLists({page: 0,pagesize:10})
+									 // this.REVISE_CONTENT_LIST(res.data.message)
+									 this.REMOVE_CONTENT_LIST()
+									 this.getContentLists({page: 0,pagesize:20})
 								}
 								uni.showToast({
 									title: '保存成功',
 									duration: 1000
 								}) 
-								uni.switchTab({
-									url: '/pages/modeList/index'
-								})
+								setTimeout(()=>{
+									uni.switchTab({
+										url: '/pages/modeList/index'
+									})
+								},1000)
+								
 							} else {
 								uni.showToast({
 									title: res.data.message,

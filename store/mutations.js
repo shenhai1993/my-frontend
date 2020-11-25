@@ -2,7 +2,7 @@
 
 import {
   SET_CONTENT_LIST, ADD_CONTENT_LIST, DELETE_CONTENT_LIST, REMOVE_CONTENT_LIST, 
-  SET_MODE_TPL, PUT_CONTENT_PAGE
+  SET_MODE_TPL, PUT_CONTENT_PAGE, REVISE_CONTENT_LIST
 } from './mutation-types'
 
 export default {
@@ -19,8 +19,15 @@ export default {
 		}  
 	})
   },
-  [REMOVE_CONTENT_LIST] (state) {
+  [REMOVE_CONTENT_LIST] (state) { // 清空内容单
   	state.contentLists.length = 0
+  },
+  [REVISE_CONTENT_LIST] (state,data) {
+	state.contentLists.forEach((item,index,array)=>{
+		if(data.id == item.id){
+			item.tpl = data.tpl
+		}  
+	})  
   },
   [ADD_CONTENT_LIST] (state, permissions) {
 		state.contentLists = state.contentLists.concat(permissions)

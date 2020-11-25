@@ -147,9 +147,11 @@
 							IMG_REAL_H = IMG_REAL_W / IMG_RATIO;
 						}
 						let cutT = 0;
-						let cutB = IMG_REAL_H - _this.cropperHeight;
+						//let cutB = IMG_REAL_H - _this.cropperHeight;
+						let cutB = (IMG_REAL_H===undefined)? 100 : IMG_REAL_H - _this.cropperHeight;
 						let cutL = 0;
-						let cutR = IMG_REAL_W - _this.cropperWidth;
+						let cutR = (IMG_REAL_W===undefined)? 100 : IMG_REAL_W - _this.cropperWidth;
+						//let cutR = IMG_REAL_W - _this.cropperWidth;
 						_this.setData({
 							cropperW: IMG_REAL_W,
 							cropperH: IMG_REAL_H,

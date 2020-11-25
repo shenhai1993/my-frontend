@@ -1,1 +1,0 @@
-<view><block wx:for="{{$root.l0}}" wx:for-item="item" wx:for-index="index" wx:key="index"><button class="{{['marginSm tagsBtn',(item.g0!=-1)?'activeAfter':'']}}" size="mini" data-event-opts="{{[['tap',[['choosely',[index,'$0'],[[['groupArr','',index,'name']]]]]]]}}" bindtap="__e">{{item.$orig.name}}</button></block></view>

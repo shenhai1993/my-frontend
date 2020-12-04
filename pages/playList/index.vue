@@ -18,7 +18,10 @@
 							<view class="createItem playTab">
 								<p>状态: 
 									<font v-if="item.status===0" class="pl-15">可使用</font>
+									<font v-if="item.status===1" class="pl-15">未审核</font>
+									<font v-if="item.status===2" class="pl-15">驳回</font>
 									<font v-if="item.status===3"  class="pl-15">已发布</font>
+									<font v-if="item.status===4"  class="pl-15">过期</font>
 								</p>
 								<p>方向: 
 									<font v-if="item.direction===0"  class="pl-15">横屏</font>
@@ -51,7 +54,7 @@
 							<image class="thumbnail-Img" mode="widthFix" :src="item.tpl.thumb_path"
 							></image>
 						</view>
-						<view class="loadmore-tips" v-show="fiterFiles.length<1">{{loadTitle}}</view>
+						 <view class="loadmore-tips">{{loadingType === 0 ? contentText.contentdown : (loadingType === 1 ? contentText.contentrefresh : contentText.contentnomore)}}</view>
 					</view>
 				</scroll-view>	
 			</view>	
@@ -71,9 +74,9 @@
 					<form @submit="formSubmit" @reset="formReset">
 						<view class="blank30"></view>
 						<view class="uni-form-item uni-column">
-							<text class="tit" maxlength="15">输入名称：</text>
+							<text class="tit">输入名称：</text>
 							<view class="uni-form-item__content">
-								<input class="input" type="text" v-model="formData.name" placeholder="请输入" placeholder-class="placeholder" />
+								<input class="input" type="text"  maxlength="15" v-model="formData.name" placeholder="请输入" placeholder-class="placeholder" />
 							</view>
 						</view>
 						<view class="uni-form-item uni-column">
@@ -129,16 +132,20 @@
 			})
 			return {
 				scrollTop: 50, 
-				isLoadMore: false,
 				loadTitle: '没有数据了',
+				loadingType: 0,
+				contentText: {
+					contentdown: "上拉显示更多",
+					contentrefresh: "正在加载...",
+					contentnomore: "没有更多数据了"
+				},
 				title: '播出单',
 				array: [], // 播出单列表
 				tagsArr: [], // 标签集合
 				treeArr: [], // 分组标签
 				tags: [], // 选中的标签
 				tree: [], // 选中的分组
-				// page:1,
-				iconType: ['success'],
+				status: 0,
 				playStatus: 0, // 新建播出单弹窗
 				nextBtn: false,
 				swiperheight: 0,
@@ -171,7 +178,6 @@
 				selectData: {},
 				dateStart: currentDate,
 				dateEnd: currentDate,
-				isLoadMore:false,  //是否加载中
 				isOpened: false,
 				menuArr: [
 					{title: '发布', type: 0},
@@ -234,16 +240,15 @@
 			  }
 		},
 		methods: {
-			...mapMutations([ 'SET_CONTENT_LIST', 'PUT_CONTENT_PAGE'
+			...mapMutations([ 'SET_CONTENT_LIST', 'PUT_CONTENT_PAGE', 'REMOVE_CONTENT_LIST'
 			]),
 			...mapActions([
 			  'getContentLists'
 			]),
 			scrollFn(e) { 
-				if(!this.isLoadMore || this.page===1){  //此处判断，上锁，防止重复请求
-					this.isLoadMore=true
+				if(this.loadingType===0 || this.page===0){  //此处判断，上锁，防止重复请求
+					this.loadingType = 1	
 					this.PUT_CONTENT_PAGE(2)
-					// this.page+=1
 					this.getContentList() // 获取内容列表
 				 } 
 			  // 防抖，优化性能
@@ -298,21 +303,17 @@
 			},
 			// 获取内容列表
 			getContentList: function(){
-				this.getContentLists({page: this.page,pagesize:this.pagesize})
+				this.getContentLists({page: this.page,pagesize:this.pagesize,d:this.direction})
 				.then(res =>{
 					if(res.data.message.data){
-						// this.SET_CONTENT_LIST(res.data.message.data)
-						if(res.data.message.data.length<this.pagesize){  //判断接口返回数据量小于请求数据量，则表示此为最后一页
-							  this.isLoadMore=true      
-							  this.loadTitle = '没有更多了...'
-							  setTimeout(()=>{
-								  this.loadTitle = ''
-								},3000)										   
+						uni.stopPullDownRefresh()
+						if(res.data.message.data.length<this.pagesize){  //判断接口返回数据量小于请求数据量，则表示此为最后一页  
+							  this.loadingType = 2	
 						}else{
-							  this.isLoadMore=false
+							  this.loadingType = 0	
 						}
 					  }else{
-						this.isLoadMore=true  
+						 this.loadingType = 2
 					}
 				}).catch( error => {
 					uni.showToast({title:error,icon:'none'})
@@ -326,6 +327,17 @@
 			toggleDirection(d){
 				this.chooseAfterValue = []
 				this.direction = d
+				this.renovateData()
+			},
+			// 先清空内容再重新加载内容单
+			renovateData: function(){
+				this.loadingType = 0
+				this.PUT_CONTENT_PAGE(1)
+				this.REMOVE_CONTENT_LIST()
+				setTimeout(()=>{
+					this.getContentList() 
+				},400)
+				 
 			},
 			onHideDrawer: function(){
 				let curDate = this.getDate({
@@ -336,6 +348,7 @@
 				this.formData.name = ''
 				this.chooseAfterValue = []
 				this.defaultActive = []
+				this.timeStart = '00:00'
 				this.timeOther = '请选择时间'
 				this.endDate = '请选择日期'
 				this.dateStart = curDate
@@ -348,9 +361,9 @@
 				} else{
 					this.timeEnd = e.target.value
 					this.timeOther = this.timeEnd
-					this.setData({
-					  timeOther: this.timeEnd
-					})
+					// this.setData({
+					//   timeOther: this.timeEnd
+					// })
 				}
 			},
 			bindDateChange: function(e,n) {
@@ -404,6 +417,7 @@
 			// 打开底部操作栏
 			operate(item,i){
 				uni.hideTabBar()
+				this.status = item.status
 				this.id = item.id
 				this.selectData = item
 				this.index = i
@@ -470,18 +484,26 @@
 						break
 					case 3:
 						// 编辑播出单
-						this.isOpened = false
-						this.$refs.drawer.open()
-						this.selectData.trees.forEach((item,i)=>{
-							this.defaultActive.push(item.id)
-							this.tree.push(item.id) 
-						})
-						this.chooseAfterValue = this.selectData.contents
-						this.formData.name = this.selectData.name
-						this.timeStart = this.selectData.schedule.time.start
-						this.timeOther = this.selectData.schedule.time.end
-						this.dateStart = this.selectData.schedule.date.start
-						this.endDate = this.selectData.schedule.date.end
+						if (this.status===3) {
+							uni.showToast({
+							    title: '已发布的播出单不可编辑',
+								icon: 'none',
+							    duration: 1500
+							})
+						} else {
+							this.isOpened = false
+							this.$refs.drawer.open()
+							this.selectData.trees.forEach((item,i)=>{
+								this.defaultActive.push(item.id)
+								this.tree.push(item.id) 
+							})
+							this.chooseAfterValue = this.selectData.contents
+							this.formData.name = this.selectData.name
+							this.timeStart = this.selectData.schedule.time.start
+							this.timeOther = this.selectData.schedule.time.end
+							this.dateStart = this.selectData.schedule.date.start
+							this.endDate = this.selectData.schedule.date.end
+						}
 						break	
 				}	
 			},
@@ -578,11 +600,12 @@
 		}
 	}
 	.loadmore-tips{
-		display: block;
-		width: 100%;
 		text-align: center;
-		padding: 15rpx;
+		background-color: #F5F5F5;
+		padding: 25rpx;
+		color: #808080;
 		font-size: 30rpx;
+		width: 100%;
 	}
 	.createItem{
 		position: absolute;

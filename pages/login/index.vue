@@ -75,13 +75,15 @@
 							 	this.getMe()              
 							 }, 500)
 						} else {
-							this.loginFormStatus = true
 							uni.hideLoading() 
 							uni.showToast({
 							  	title: res.data.message,
 							  	icon: 'none', 
 							  	duration: 1000
 							});
+							setTimeout( ()=> {
+								this.loginFormStatus = true        
+							}, 1500)
 						}
 					}
 				})

@@ -16,14 +16,14 @@
 			</view>
 		</div>
 		<!-- 内容列表 -->
-		<div class="wrap" :style="{height: swiperheight + 'px' }" v-if="current===1">
+		<div class="wrap hidden" :style="{height: swiperheight + 'px' }"  :class="{dis:current == 1}">
 			<view class="right">
 				<view>
 					<button @click="toggleBtnList(0)" class="toggleBtn" :class="{active: !toggleDir}">横屏</button>
 					<button @click="toggleBtnList(1)"  class="toggleBtn" :class="{active: toggleDir}">竖屏</button>
 				</view>
-				<imageList :dataList="fiterFiles" :types="false" @onClickImages="removeArr"></imageList>
-				 <view class="loadmore-tips">{{loadTitle}}</view>
+				<imageList :dataList="fiterFiles" :types="false" @onClickImages="operateArr"></imageList>
+				 <view class="loadmore-tips">{{loadingType === 0 ? contentText.contentdown : (loadingType === 1 ? contentText.contentrefresh : contentText.contentnomore)}}</view>
 			</view>
 		</div>
 		<!-- 播出单操作区 -->
@@ -51,17 +51,21 @@
 				// page:1,
 				pagesize:12,
 				mPage: 0,
-				mPagesize: 12,
+				mPagesize: 10,
 				id: 0,
 				templateId: 0,
-				isLoadMore: false,
 				modeLoadMore: false,
 				direction: 0,
 				swiperheight: 0,
 				isDirection: 0,
 				toggleActive: false,
 				toggleDir: false,
-				loadTitle: '',
+				loadingType: 0,
+				contentText: {
+					contentdown: "上拉显示更多",
+					contentrefresh: "正在加载...",
+					contentnomore: "没有更多数据了"
+				},
 				isOpened: false,
 				menuArr: [
 					{title: '编辑', type: 0},
@@ -101,7 +105,7 @@
 			});
 			this.getDataList(0,1) // 初始化模板列表
 			if (this.contentArray.length===0) {
-				this.getContentList() // 初始化内容列表
+			  this.getContentList() // 初始化内容列表
 			}
 		},
 		computed: {
@@ -117,14 +121,11 @@
 		},	  
 		onShow: function () {
 			uni.showTabBar()
-			if (this.current===0) {
-				this.renovateData()
-			}
 		},
 		// 上拉触底函数
 		onReachBottom(){
-			 if(!this.isLoadMore && this.current===1){  //此处判断，上锁，防止重复请求
-				this.isLoadMore=true
+			 if(this.loadingType===0 && this.current===1){  //此处判断，上锁，防止重复请求
+				this.loadingType = 1	
 				this.PUT_CONTENT_PAGE(2)
 				this.getContentList() // 获取内容列表
 			  } 
@@ -138,9 +139,7 @@
 		onPullDownRefresh(){
 			this.getDataList(this.isDirection,this.isActive) // 上拉刷新模板列表
 			// this.page= 0			// 刷新时重置内容page
-			this.PUT_CONTENT_PAGE(1)
-			this.REMOVE_CONTENT_LIST()
-			this.getContentList()  // 上拉刷新内容列表
+			this.renovateData()
 		 },
 		methods: {
 			...mapMutations([ 'DELETE_CONTENT_LIST', 'PUT_CONTENT_PAGE', 
@@ -154,7 +153,7 @@
 				 this.current = index
 				 this.onCancelClick()
 				 if(index===0) {
-					this.renovateData()
+					// this.renovateData()
 				 }
 			},
 			// 选择生成内容单的模板
@@ -163,11 +162,15 @@
 					url: '/pages/customMode/index?id='+item.id
 				})
 			},
-			// 重新加载内容单
+			// 先清空内容再重新加载内容单
 			renovateData: function(){
+				this.loadingType = 0
 				this.PUT_CONTENT_PAGE(1)
 				this.REMOVE_CONTENT_LIST()
-				this.getContentList()  
+				setTimeout(()=>{
+					this.getContentList() 
+				},400)
+				 
 			},
 			/**
 			 *  切换模板类型
@@ -190,6 +193,7 @@
 			toggleBtnList(n){
 				this.direction = n
 				this.toggleDir = !this.toggleDir
+				this.renovateData()
 			},
 			/**
 			 *  查询模板列表
@@ -226,25 +230,21 @@
 			},
 			// 获取内容列表
 			getContentList: function(){
-				this.getContentLists({page: this.page,pagesize:this.pagesize})
+				uni.showNavigationBarLoading();//显示加载动画
+				this.getContentLists({page: this.page,pagesize:this.pagesize,d:this.direction})
 				.then(res =>{
 					if(res.data.message.data){
 						uni.stopPullDownRefresh()
-						if(res.data.message.data.length<this.pagesize){  //判断接口返回数据量小于请求数据量，则表示此为最后一页
-							  this.isLoadMore=true      
-							  this.loadTitle = '没有更多了...'
-							  setTimeout(()=>{
-									this.loadTitle = ''
-							  },3000)		
+						if(res.data.message.data.length<this.pagesize){  //判断接口返回数据量小于请求数据量，则表示此为最后一页  
+							  this.loadingType = 2	
 						}else{
-							  this.isLoadMore=false
+							  this.loadingType = 0	
 						}
 					  }else{
-						this.isLoadMore=true  
+						 this.loadingType = 2
 					}
 				}).catch( error => {
 					uni.showToast({title:error,icon:'none'})
-					this.isLoadMore=false
 					if(this.page>1){
 						// this.page-=1
 						this.PUT_CONTENT_PAGE(3)
@@ -259,11 +259,10 @@
 				},380)
 				
 			},
-			// 删除内容模板
-			removeArr: function(item) {
+			// 操作内容模板
+			operateArr: function(item) {
 				uni.hideTabBar()
 				this.SET_MODE_TPL(item)
-				// uni.setStorageSync('tpl',item)
 				this.isOpened = true
 				this.id = item.id
 				this.templateId = item.template_id
@@ -312,6 +311,12 @@
 </script>
 
 <style lang="scss">
+	.hidden{
+		visibility: hidden;
+	}
+	.hidden.dis{
+		visibility: visible;
+	}
 	.wrap{
 		width: 100vw;
 		display: flex;
@@ -381,7 +386,9 @@
 	}
 	.loadmore-tips{
 		text-align: center;
+		background-color: #F5F5F5;
 		padding: 15rpx;
+		color: #808080;
 		font-size: 30rpx;
 	}
 </style>

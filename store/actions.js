@@ -6,7 +6,7 @@ import {
 import http from '../request.js'
 
 export default {
-  async getContentLists({ commit, state }, {page,pagesize,type}) {
+  async getContentLists({ commit, state }, {page,pagesize,d}) {
 	// type存在的时候查询添加单条数据  
     let res = null
     try {
@@ -15,7 +15,8 @@ export default {
   		url: '/bank/app/contents',
   		data:{
   			"page": page,
-  			"per_page": pagesize
+  			"per_page": pagesize,
+			"d": d
   		}
   	})   
     } catch (e) {

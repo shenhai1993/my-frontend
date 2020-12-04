@@ -53,15 +53,6 @@
 </template>
 
 <script>
-	class List {
-			constructor(code) {
-			    this.isShow = false;
-				this.code = code;
-			}
-			showCode(){
-				this.isShow = !this.isShow;
-			}
-		}
 	import gmyImgCropper from "../components/crop/cropper.vue"
 	import wrapDiv from "../components/module/wrap.vue"
 	import imageDiv from "../components/module/image.vue"
@@ -84,7 +75,7 @@
 				name: '',
 				seconds: 20,
 				contentId: 0,
-				removeStatu: false,
+				removeStatu: false, // 编辑还是新建内容单判断:
 				imgSrc:'123',
 				detaArr: {},
 				disAbledBtn: true,
@@ -145,7 +136,7 @@
 				  this.detaArr = JSON.parse(res2.data.message.dynamic) 
 				  this.thumb_path = res2.data.message.thumb_path // 获取模板缩略图
 				  this.Id = res2.data.message.id // 获取当前模板id
-				  this.removeStatu = (option.type)?false:true
+				  this.removeStatu = (option.type)?false:true // false 编辑内容，true为新建内容
 				  if (!option.type) {
 					  this.newBuilt().then(res=>{
 						  this.contentId = res.message.id
@@ -172,7 +163,7 @@
 				})
 		},
 		onUnload: function () {//如果页面被卸载时被执行
-			if (this.removeStatu) {
+			if (this.removeStatu) { // 不保存内容单离开页面的删除新建的内容单据
 				api.deleteContentLists(this.contentId)
 			}
 		},
@@ -277,18 +268,18 @@
 				if (this.seconds>65535) {
 					uni.showToast({
 						title: '最大时长65535',
-						image:'/static/Fail.png', 
+						icon: 'none', 
 						duration: 1000
 					}) 	
 				} else if(this.seconds =='') {
 					uni.showToast({
 						title: '时长不能为空',
-						image:'/static/Fail.png', 
+						icon: 'none',  
 						duration: 1000	})
 				} else if(this.name==='') {
 					uni.showToast({
 						title: '名称不能为空',
-						image:'/static/Fail.png', 
+						icon: 'none',  
 						duration: 1000
 					}) 
 				}
@@ -314,11 +305,12 @@
 									
 									this.ADD_CONTENT_LIST(res.data.message)
 									this.removeStatu = false
+									this.REVISE_CONTENT_LIST(res.data.message)
 									// this.getContentLists({page: 0,pagesize:10})
 								} else {
-									 // this.REVISE_CONTENT_LIST(res.data.message)
+									// this.REVISE_CONTENT_LIST(res.data.message)
 									 this.REMOVE_CONTENT_LIST()
-									 this.getContentLists({page: 0,pagesize:20})
+									 this.getContentLists({page: 0,pagesize:10})
 								}
 								uni.showToast({
 									title: '保存成功',

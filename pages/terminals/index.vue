@@ -5,7 +5,9 @@
 			<view class="terminalsTop" v-for="(item,$index) in terminalsArr" :key="$index" @click="getTerminalsItem(item.id)">
 				<view class="terminalsDir">
 					<font v-if="item.direction===0">横</font>
-					<font v-else>竖</font>
+					<font v-if="item.direction===1">竖</font>
+					<font v-if="item.direction===2">横屏（反）</font>
+					<font v-if="item.direction===3">竖屏（反）</font>
 				</view>
 				<view class="terminalsName">
 					<p>终端名称:{{item.name}}</p>
@@ -56,7 +58,7 @@
 			uni.showLoading({
 			    title: '加载中'
 			 })
-			this.getTerminalsList()
+			//this.getTerminalsList()
 		},
 		onShow() {
 			this.getTerminalsList()

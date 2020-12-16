@@ -29,6 +29,8 @@
 					<p>屏幕方向:
 						<font v-if="terminalsDetails.direction===0">横屏</font>
 						<font v-if="terminalsDetails.direction===1">竖屏</font>
+						<font v-if="terminalsDetails.direction===2">横屏（反）</font>
+						<font v-if="terminalsDetails.direction===3">竖屏（反）</font>
 					</p>
 					<p>状态:
 						<font v-if="terminalsDetails.online_status===1">在线</font>

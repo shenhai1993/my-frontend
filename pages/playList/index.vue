@@ -44,7 +44,7 @@
 			</view>
 			<!-- 内容单 -->
 			<view v-show="playStatus===0">
-				<scroll-view  style='height: 630px;' 
+				<scroll-view  :style='{height: clientHeight}' 
 				    :scroll-y="true" 
 				    :scroll-top="scrollTop"
 				     @scrolltolower="scrollFn">  
@@ -131,7 +131,7 @@
 			    format: true
 			})
 			return {
-				scrollTop: 50, 
+				scrollTop: 150, 
 				loadTitle: '没有数据了',
 				loadingType: 0,
 				contentText: {
@@ -153,6 +153,7 @@
 				groupId: 0, 
 				id: 0, // 播出单Id
 				index: 0,
+				clientHeight: '300px',
 				chooseAfterValue: [],
 				formData:{
 					name: '',
@@ -188,6 +189,8 @@
 			}
 		},
 		onLoad() {
+			let sysInfo = uni.getSystemInfoSync()
+			this.clientHeight = sysInfo.windowHeight - 40 +'px'
 			uni.showLoading({ title: '加载中' })
 			this.getDataLists() // 获取播出单列表
 			if (this.dataList.length===0) {

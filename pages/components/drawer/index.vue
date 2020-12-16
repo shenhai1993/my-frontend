@@ -4,7 +4,7 @@
 			<view class="top">
 				<icon class="iconfont icon-RectangleCopy18" type="cancel" size="26"></icon>
 			</view>
-			<view :style="{height: halfHeight}" @click.stop style="margin-top: 20%;background: #FFFFFF; overflow: auto;">
+			<view :style="{height: halfHeight}" @click.stop style="margin-top: 80px;background: #FFFFFF; overflow: auto;">
 				<slot />
 			</view>
 
@@ -19,7 +19,7 @@
 		data() {
 			return {
 				show: false,
-				halfHeight: '90%',
+				halfHeight: '100%',
 			};
 		},
 		onReachBottom(){

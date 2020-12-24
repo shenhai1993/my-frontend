@@ -76,7 +76,7 @@
 						<view class="uni-form-item uni-column">
 							<text class="tit">输入名称：</text>
 							<view class="uni-form-item__content">
-								<input class="input" type="text"  maxlength="15" v-model="formData.name" placeholder="请输入" placeholder-class="placeholder" />
+								<input class="input" type="text"  maxlength="12" v-model="formData.name" placeholder="请输入" placeholder-class="placeholder" />
 							</view>
 						</view>
 						<view class="uni-form-item uni-column">
@@ -554,7 +554,7 @@
 		padding: 15upx;
 		box-sizing: border-box;
 		.imageWrap{
-			height: 280rpx;
+			height: 300rpx;
 			background: -webkit-gradient(linear, right top, left bottom,
 			 color-stop(0%, rgb(28,187,180)), color-stop(100%,rgb(111,87,180)));
 			box-shadow: $uni-box-shadow;
@@ -573,8 +573,8 @@
 				color: #FFFFFF;
 			}
 			.playTab{
-				line-height: 56rpx;
-				font-size: 34rpx;
+				line-height: 44rpx;
+				font-size: 32rpx;
 				._font{
 					padding-left: 20rpx;
 				}
@@ -612,11 +612,11 @@
 	}
 	.createItem{
 		position: absolute;
-		top: 50%;
+		top: 53%;
 		left: 50%;
 		transform: translate(-50%,-50%);
 		color: #FFFFFF;
-		width: 140px;
+		width: 125px;
 	}
 	.thumbnail-Img{
 		width: 100%;

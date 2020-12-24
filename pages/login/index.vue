@@ -142,6 +142,11 @@
 					},
 					success: (res) => {
 						if(res.data.success){
+							uni.showToast({
+							    title: res.data.message,
+								icon: "none", 
+							    duration: 2000
+							})
 							// 存储token
 							uni.setStorage({
 								 key:'Token',

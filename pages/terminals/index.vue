@@ -6,8 +6,8 @@
 				<view class="terminalsDir">
 					<font v-if="item.direction===0">横</font>
 					<font v-if="item.direction===1">竖</font>
-					<font v-if="item.direction===2">横屏（反）</font>
-					<font v-if="item.direction===3">竖屏（反）</font>
+					<font v-if="item.direction===2">横(反)</font>
+					<font v-if="item.direction===3">竖(反)</font>
 				</view>
 				<view class="terminalsName">
 					<p>终端名称:{{item.name}}</p>
@@ -111,7 +111,7 @@
 		margin-bottom: 10px;
 		.terminalsDir{
 			display: table-cell;
-			font-size: 50upx;
+			font-size: 24upx;
 			text-align: center;
 			width: 100upx;
 			height: 100upx;
